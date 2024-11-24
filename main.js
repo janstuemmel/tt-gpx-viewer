@@ -32,9 +32,13 @@ const map = new maplibregl.Map({
 map.on("load", () => {
 	const gpxSourceName = "2410tun";
 
+  const dataPath = `gpx://${location.pathname}24-10-tun.gpx`;
+
+  console.log('loading gpx from', dataPath)
+
 	map.addSource(gpxSourceName, {
 		type: "geojson",
-		data: `gpx://${location.pathname}24-10-tun.gpx`,
+		data: dataPath,
 	});
 
 	map.addLayer({

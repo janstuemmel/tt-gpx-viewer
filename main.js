@@ -34,7 +34,7 @@ map.on("load", () => {
 
 	map.addSource(gpxSourceName, {
 		type: "geojson",
-		data: `gpx://${location.pathname}/24-10-tun.gpx`,
+		data: `gpx://${location.pathname}24-10-tun.gpx`,
 	});
 
 	map.addLayer({
@@ -49,7 +49,7 @@ map.on("load", () => {
 		},
 	});
 
-	fetch(`${location.href}/poi.json`)
+	fetch(`${location.href}poi.json`)
 		.then((res) => res.json())
 		.then((list) =>
 			// biome-ignore lint/complexity/noForEach: <explanation>

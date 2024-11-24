@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  build: {
-    outDir: 'docs'
-  }
-})
+	build: {
+		outDir: "docs",
+	},
+	base: "tt-gpx-viewer",
+});

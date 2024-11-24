@@ -34,7 +34,7 @@ map.on("load", () => {
 
 	map.addSource(gpxSourceName, {
 		type: "geojson",
-		data: localtion.hostname === 'localhost' ? "gpx:///24-10-tun.gpx" : "gpx:///tt-gpx-viewer/24-10-tun.gpx",
+		data: "gpx://./24-10-tun.gpx",
 	});
 
 	map.addLayer({

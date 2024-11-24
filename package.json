@@ -1,0 +1,20 @@
+{
+  "name": "tt-gpx-viewer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "maplibre-gl": "^4.7.1",
+    "maplibre-gl-vector-text-protocol": "^0.0.5"
+  }
+}

@@ -4,5 +4,5 @@ export default defineConfig({
 	build: {
 		outDir: "docs",
 	},
-	base: "tt-gpx-viewer",
+	base: "tt-gpx-viewer/",
 });

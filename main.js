@@ -1,6 +1,7 @@
 import maplibregl from 'maplibre-gl';
 import * as mapTextProto from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import './main.css';
 
 mapTextProto.addProtocols(maplibregl);
 
@@ -9,14 +10,16 @@ const ROUTES = [
   {file: '22-10-tun.gpx', name: 'Tunesien 10/2022', color: '#009B77'},
   {file: '23-04-tun.gpx', name: 'Tunesien 04/2023', color: '#6667AB'},
   {file: '24-04-tun.gpx', name: 'Tunesien 04/2024', color: '#BB2649'},
-  {file: '24-10-tun.gpx', name: 'Tunesien 10/2024', color: '#98B4D4'},
+  {file: '24-10-tun.gpx', name: 'Tunesien 10/2024', color: '#0F4C81'},
 ];
+
+const apiKey = 'tUOkvl6XCvv71vE3zD8u';
 
 const map = new maplibregl.Map({
   container: 'map',
   center: [9.11, 33.11],
   zoom: 9,
-  style: `${location.href}mapstyle.json`,
+  style: `https://api.maptiler.com/maps/68c69456-9c73-4f0a-82be-e58bad52d250/style.json?key=${apiKey}`,
 });
 
 map.on('load', () => {
@@ -45,7 +48,8 @@ map.on('load', () => {
       type: 'line',
       paint: {
         'line-color': color,
-        'line-width': 3,
+        'line-width': 5,
+        'line-opacity': 0.6,
       },
     });
     map.setLayoutProperty(name, 'visibility', 'none');

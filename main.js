@@ -41,7 +41,6 @@ map.on('load', () => {
   fetch(`${location.href}poi.json`)
     .then((res) => res.json())
     .then((list) =>
-      // biome-ignore lint/complexity/noForEach: <explanation>
       list.forEach((poi) => {
         new maplibregl.Marker()
           .setLngLat([poi.lon, poi.lat])
@@ -53,7 +52,6 @@ map.on('load', () => {
 
 map.on('load', () => {
   const filesElem = document.getElementById('files');
-  // biome-ignore lint/complexity/noForEach: <explanation>
   ROUTES.forEach(({file, name, color}) => {
     map.addSource(name, {
       type: 'geojson',

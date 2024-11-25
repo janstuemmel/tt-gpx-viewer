@@ -13,5 +13,12 @@
       "bracketSpacing": false,
       "indentStyle": "space"
     }
+  },
+  "linter": {
+    "rules": {
+      "complexity": {
+        "noForEach": "off"
+      }
+    }
   }
 }

@@ -1,25 +1,48 @@
 body { margin: 0 }
 
-#controls {
+.shadow-box {
   background: #fff;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  border-radius: 5px;
   box-shadow: 1px 2px 8px #999;
-  color: #333;
-  font-family: Arial, Helvetica, sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  border-radius: 5px;
   border: 1px solid #b0b0b0;
 }
 
-#controls > span {
+#controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#tracks {
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+#tracks > span {
   font-weight: bold;
   border-bottom: 1px solid #e0e0e0;
   padding: 10px 15px 5px 15px;
   letter-spacing: 0.9px;
+}
+
+#ruler {
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin: 10px 0
+}
+
+#ruler-len-wrapper {
+  text-align: center;
+}
+
+#toggle-ruler {
+  color: green;
 }
 
 #files {

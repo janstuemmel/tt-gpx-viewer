@@ -16,25 +16,7 @@ const map = new maplibregl.Map({
   container: 'map',
   center: [9.11, 33.11],
   zoom: 9,
-  style: {
-    version: 8,
-    sources: {
-      osm: {
-        type: 'raster',
-        tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '&copy; OpenStreetMap Contributors',
-        maxzoom: 19,
-      },
-    },
-    layers: [
-      {
-        id: 'osm',
-        type: 'raster',
-        source: 'osm',
-      },
-    ],
-  },
+  style: `${location.href}mapstyle.json`,
 });
 
 map.on('load', () => {

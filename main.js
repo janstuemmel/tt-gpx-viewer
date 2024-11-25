@@ -4,6 +4,12 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 mapTextProto.addProtocols(maplibregl);
 
+const ROUTES = [
+	{ file: "23-04-tun.gpx", name: "Tunesien 10/2023", color: "#6667AB" },
+	{ file: "24-04-tun.gpx", name: "Tunesien 04/2024", color: "#BB2649" },
+	{ file: "24-10-tun.gpx", name: "Tunesien 10/2024", color: "#98B4D4" },
+];
+
 const map = new maplibregl.Map({
 	container: "map",
 	center: [9.11, 33.11],
@@ -27,28 +33,9 @@ const map = new maplibregl.Map({
 			},
 		],
 	},
-}).addControl(new maplibregl.NavigationControl());
+});
 
 map.on("load", () => {
-	const gpxSourceName = "2410tun";
-
-	map.addSource(gpxSourceName, {
-		type: "geojson",
-		data: `gpx://${location.pathname}24-10-tun.gpx`,
-	});
-
-	map.addLayer({
-		id: gpxSourceName,
-		type: "line",
-		source: gpxSourceName,
-		minzoom: 0,
-		maxzoom: 20,
-		paint: {
-			"line-color": "red",
-			"line-width": 5,
-		},
-	});
-
 	fetch(`${location.href}poi.json`)
 		.then((res) => res.json())
 		.then((list) =>
@@ -60,4 +47,40 @@ map.on("load", () => {
 					.setPopup(new maplibregl.Popup().setHTML(poi.name));
 			}),
 		);
+});
+
+map.on("load", () => {
+	const filesElem = document.getElementById("files");
+	// biome-ignore lint/complexity/noForEach: <explanation>
+	ROUTES.forEach(({ file, name, color }) => {
+		map.addSource(name, {
+			type: "geojson",
+			data: `gpx://${location.pathname}${file}`,
+		});
+		map.addLayer({
+			id: name,
+			source: name,
+			type: "line",
+			paint: {
+				"line-color": color,
+				"line-width": 3,
+			},
+		});
+		map.setLayoutProperty(name, "visibility", "none");
+		const div = document.createElement("div");
+		const txt = document.createTextNode(name);
+		const checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+		checkbox.style.accentColor = color;
+		checkbox.addEventListener("change", () => {
+			map.setLayoutProperty(
+				name,
+				"visibility",
+				checkbox.checked ? "visible" : "none",
+			);
+		});
+		div.appendChild(checkbox);
+		div.appendChild(txt);
+		filesElem.appendChild(div);
+	});
 });

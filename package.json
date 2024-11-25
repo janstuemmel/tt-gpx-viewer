@@ -4,13 +4,16 @@
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "prepare": "lefthook install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "lefthook": "^1.8.4",
     "typescript": "^5.7.2",
     "vite": "^5.4.11"
   },

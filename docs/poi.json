@@ -40,7 +40,7 @@
     "lon": "9.1095155"
   },
   {
-    "name": "TINSOUANE",
+    "name": "Tinsouane",
     "lat": "32.787797",
     "lon": "9.0758296"
   },
@@ -50,17 +50,17 @@
     "lon": "9.112085"
   },
   {
-    "name": "Dekamis El Kebir الدكنيس لكبار",
+    "name": "Dekamis El Kebir",
     "lat": "32.708775",
     "lon": "9.2209559"
   },
   {
-    "name": "DEKANIS ES SGHAR",
+    "name": "Dekanis El Shegir",
     "lat": "32.643442",
     "lon": "9.220752"
   },
   {
-    "name": "مطماطة",
+    "name": "Matmata",
     "lat": "33.545737",
     "lon": "9.9671116"
   },
@@ -70,7 +70,7 @@
     "lon": "10.262651"
   },
   {
-    "name": "تمغزة",
+    "name": "Tamerza",
     "lat": "34.386394",
     "lon": "7.9334956"
   },
@@ -100,22 +100,17 @@
     "lon": "10.192412"
   },
   {
-    "name": "Sif Es Souane سيف الصوان",
+    "name": "Sif Es Souane",
     "lat": "32.425065",
     "lon": "8.7871649"
   },
   {
-    "name": "GOUR KLEB",
+    "name": "Gour El Kleb",
     "lat": "32.766411",
     "lon": "9.3570726"
   },
   {
-    "name": "الميدة",
-    "lat": "32.814409",
-    "lon": "9.4350176"
-  },
-  {
-    "name": "Camp auf Aufkleber",
+    "name": "Lager El Mida",
     "lat": "32.813307",
     "lon": "9.4360518"
   },
@@ -135,7 +130,7 @@
     "lon": "9.4143981"
   },
   {
-    "name": "Unbekannter Ort",
+    "name": "Lager Matmata",
     "lat": "33.533234",
     "lon": "9.8296583"
   },
@@ -145,7 +140,7 @@
     "lon": "10.320275"
   },
   {
-    "name": "Peter Schluchten",
+    "name": "Tamerza Schluchten",
     "lat": "34.378739",
     "lon": "7.9164878"
   }

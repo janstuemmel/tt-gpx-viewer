@@ -22,17 +22,46 @@ const map = new maplibregl.Map({
   style: `https://api.maptiler.com/maps/68c69456-9c73-4f0a-82be-e58bad52d250/style.json?key=${apiKey}`,
 });
 
-map.on('load', () => {
+map.on('load', async () => {
+  await map
+    .loadImage(`${location.pathname}point.png`)
+    .then((res) => map.addImage('poi-marker', res.data));
+
   fetch(`${location.href}poi.json`)
     .then((res) => res.json())
-    .then((list) =>
-      list.forEach((poi) => {
-        new maplibregl.Marker()
-          .setLngLat([poi.lon, poi.lat])
-          .addTo(map)
-          .setPopup(new maplibregl.Popup().setHTML(poi.name));
-      }),
-    );
+    .then((list) => {
+      map.addSource('places', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: list.map(({name, lat, lon}) => ({
+            type: 'Feature',
+            properties: {
+              description: name,
+              icon: 'poi-marker',
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [lon, lat],
+            },
+          })),
+        },
+      });
+
+      map.addLayer({
+        id: 'poi-labels',
+        type: 'symbol',
+        source: 'places',
+        layout: {
+          'text-field': ['get', 'description'],
+          'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+          'text-radial-offset': 0.5,
+          'text-size': 12,
+          'text-justify': 'auto',
+          'icon-image': ['get', 'icon'],
+        },
+      });
+    });
 });
 
 map.on('load', () => {

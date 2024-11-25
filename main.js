@@ -5,7 +5,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 mapTextProto.addProtocols(maplibregl);
 
 const ROUTES = [
-	{ file: "23-04-tun.gpx", name: "Tunesien 10/2023", color: "#6667AB" },
+	{ file: "22-04-tun.gpx", name: "Tunesien 04/2022", color: "#B565A7" },
+	{ file: "22-10-tun.gpx", name: "Tunesien 10/2022", color: "#009B77" },
+	{ file: "23-04-tun.gpx", name: "Tunesien 04/2023", color: "#6667AB" },
 	{ file: "24-04-tun.gpx", name: "Tunesien 04/2024", color: "#BB2649" },
 	{ file: "24-10-tun.gpx", name: "Tunesien 10/2024", color: "#98B4D4" },
 ];

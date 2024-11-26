@@ -13,13 +13,12 @@
   "description": "",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@turf/turf": "^7.1.0",
     "lefthook": "^1.8.4",
     "typescript": "^5.7.2",
     "vite": "^5.4.11"
   },
   "dependencies": {
-    "@mapbox/mapbox-gl-draw": "^1.4.3",
+    "@turf/turf": "^7.1.0",
     "maplibre-gl": "^4.7.1",
     "maplibre-gl-vector-text-protocol": "^0.0.5"
   }

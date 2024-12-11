@@ -1,10 +1,17 @@
 import {length} from '@turf/turf';
-import maplibregl from 'maplibre-gl';
+import maplibre from 'maplibre-gl';
 import * as mapTextProto from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './main.css';
+import {empty} from '@versatiles/style';
 
-mapTextProto.addProtocols(maplibregl);
+import {administrative} from './layers/administrative';
+import {infrastructure} from './layers/infrastructure';
+import {labels} from './layers/labels';
+import {land} from './layers/land';
+import {water} from './layers/water';
+
+mapTextProto.addProtocols(maplibre);
 
 const ROUTES = [
   {file: '22-04-tun.gpx', name: 'Tunesien 04/2022', color: '#B565A7'},
@@ -14,18 +21,122 @@ const ROUTES = [
   {file: '24-10-tun.gpx', name: 'Tunesien 10/2024', color: '#0F4C81'},
 ];
 
-const apiKey = 'tUOkvl6XCvv71vE3zD8u';
+// const apiKey = 'tUOkvl6XCvv71vE3zD8u';
 
-const map = new maplibregl.Map({
+// const map = new maplibregl.Map({
+//   container: 'map',
+//   center: [9.11, 33.11],
+//   zoom: 9,
+//   style: `https://api.maptiler.com/maps/68c69456-9c73-4f0a-82be-e58bad52d250/style.json?key=${apiKey}`,
+// });
+
+const style = empty({
+  tiles: ['/tiles/osm/{z}/{x}/{y}'],
+  baseUrl: 'https://tiles.versatiles.org',
+  glyphs: '/assets/fonts/{fontstack}/{range}.pbf',
+  sprite: [
+    {id: 'versatiles', url: '/assets/sprites/sprites'},
+    {
+      id: 'osm',
+      url: 'https://demotiles.maplibre.org/styles/osm-bright-gl-style/sprite',
+    },
+  ],
+});
+
+console.log(style);
+
+const layers = [
+  {
+    id: 'background',
+    type: 'background',
+    paint: {
+      'background-color': '#edf1e7',
+    },
+  },
+  ...water,
+  ...land,
+  ...administrative,
+  ...infrastructure,
+  ...labels,
+];
+
+const map = new maplibre.Map({
   container: 'map',
+  style: {...style, layers},
   center: [9.11, 33.11],
   zoom: 9,
-  style: `https://api.maptiler.com/maps/68c69456-9c73-4f0a-82be-e58bad52d250/style.json?key=${apiKey}`,
+  maxZoom: 14,
+  // bounds: []
 });
 
 let rulerActive = false;
 
 map.on('load', async () => {
+  // GPX
+
+  const filesElem = document.getElementById('files');
+  ROUTES.forEach(({file, name, color}) => {
+    map.addSource(name, {
+      type: 'geojson',
+      data: `gpx://${location.pathname}${file}`,
+    });
+    map.addLayer({
+      id: name,
+      source: name,
+      type: 'line',
+      paint: {
+        'line-color': color,
+        'line-width': 5,
+        'line-opacity': 0.6,
+      },
+    });
+    map.setLayoutProperty(name, 'visibility', 'none');
+    const div = document.createElement('div');
+    const txt = document.createTextNode(name);
+    const checkbox = document.createElement('input');
+    checkbox.setAttribute('type', 'checkbox');
+    checkbox.style.accentColor = color;
+    checkbox.addEventListener('change', () => {
+      map.setLayoutProperty(
+        name,
+        'visibility',
+        checkbox.checked ? 'visible' : 'none',
+      );
+    });
+    div.appendChild(checkbox);
+    div.appendChild(txt);
+    filesElem.appendChild(div);
+  });
+
+  // TERRAIN
+
+  map.addSource('aws-terrain', {
+    type: 'raster-dem',
+    tiles: [
+      'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+    ],
+    encoding: 'terrarium',
+    tileSize: 256,
+    attribution: 'tbd',
+  });
+
+  map.addLayer(
+    {
+      id: 'hills',
+      source: 'aws-terrain',
+      type: 'hillshade',
+      layout: {visibility: 'visible'},
+      maxzoom: 15,
+      paint: {
+        'hillshade-exaggeration': 1,
+        'hillshade-accent-color': 'hsla(0, 0%, 0%, 0.5)',
+        'hillshade-highlight-color': 'hsla(100, 100%, 100%, 0.3)',
+        'hillshade-shadow-color': 'hsla(0, 0%, 0%, 0.3)',
+      },
+    },
+    'water-ocean',
+  );
+
   // POI
 
   await map
@@ -58,9 +169,10 @@ map.on('load', async () => {
         type: 'symbol',
         source: 'places',
         layout: {
+          'text-font': ['noto_sans_regular'],
           'text-field': ['get', 'description'],
           'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-          'text-radial-offset': 0.5,
+          'text-radial-offset': 1,
           'text-size': 12,
           'text-justify': 'auto',
           'icon-image': ['get', 'icon'],
@@ -175,41 +287,5 @@ map.on('load', async () => {
       layers: ['ruler-points'],
     });
     map.getCanvas().style.cursor = features.length ? 'pointer' : 'crosshair';
-  });
-
-  // GPX
-
-  const filesElem = document.getElementById('files');
-  ROUTES.forEach(({file, name, color}) => {
-    map.addSource(name, {
-      type: 'geojson',
-      data: `gpx://${location.pathname}${file}`,
-    });
-    map.addLayer({
-      id: name,
-      source: name,
-      type: 'line',
-      paint: {
-        'line-color': color,
-        'line-width': 5,
-        'line-opacity': 0.6,
-      },
-    });
-    map.setLayoutProperty(name, 'visibility', 'none');
-    const div = document.createElement('div');
-    const txt = document.createTextNode(name);
-    const checkbox = document.createElement('input');
-    checkbox.setAttribute('type', 'checkbox');
-    checkbox.style.accentColor = color;
-    checkbox.addEventListener('change', () => {
-      map.setLayoutProperty(
-        name,
-        'visibility',
-        checkbox.checked ? 'visible' : 'none',
-      );
-    });
-    div.appendChild(checkbox);
-    div.appendChild(txt);
-    filesElem.appendChild(div);
   });
 });

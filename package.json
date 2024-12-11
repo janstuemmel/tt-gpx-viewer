@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@turf/turf": "^7.1.0",
+    "@versatiles/style": "^5.0.0",
     "maplibre-gl": "^4.7.1",
     "maplibre-gl-vector-text-protocol": "^0.0.5"
   }

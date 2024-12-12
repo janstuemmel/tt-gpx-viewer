@@ -1,9 +1,14 @@
-import {length} from '@turf/turf';
-import maplibre from 'maplibre-gl';
+import maplibre, {
+  type LayerSpecification,
+  NavigationControl,
+  type IControl,
+} from 'maplibre-gl';
 import * as mapTextProto from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import './main.css';
+import RulerControlInvisible from '@mapbox-controls/ruler';
 import {empty} from '@versatiles/style';
+import '@mapbox-controls/ruler/src/index.css';
+import './main.css';
 
 import {administrative} from './layers/administrative';
 import {infrastructure} from './layers/infrastructure';
@@ -21,15 +26,6 @@ const ROUTES = [
   {file: '24-10-tun.gpx', name: 'Tunesien 10/2024', color: '#0F4C81'},
 ];
 
-// const apiKey = 'tUOkvl6XCvv71vE3zD8u';
-
-// const map = new maplibregl.Map({
-//   container: 'map',
-//   center: [9.11, 33.11],
-//   zoom: 9,
-//   style: `https://api.maptiler.com/maps/68c69456-9c73-4f0a-82be-e58bad52d250/style.json?key=${apiKey}`,
-// });
-
 const style = empty({
   tiles: ['/tiles/osm/{z}/{x}/{y}'],
   baseUrl: 'https://tiles.versatiles.org',
@@ -45,7 +41,7 @@ const style = empty({
 
 console.log(style);
 
-const layers = [
+const layers: LayerSpecification[] = [
   {
     id: 'background',
     type: 'background',
@@ -69,12 +65,47 @@ const map = new maplibre.Map({
   // bounds: []
 });
 
-let rulerActive = false;
+const rulerInvisible = new RulerControlInvisible({
+  labelLayout: {'text-font': ['noto_sans_regular']},
+  invisible: true,
+});
+
+class RulerControl implements IControl {
+  private elem: HTMLElement | null;
+  onAdd() {
+    const div = document.createElement('div');
+    div.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+    const button = document.createElement('button');
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-ruler-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.875 8c.621 0 1.125 .512 1.125 1.143v5.714c0 .631 -.504 1.143 -1.125 1.143h-15.875a1 1 0 0 1 -1 -1v-5.857c0 -.631 .504 -1.143 1.125 -1.143h15.75z" /><path d="M9 8v2" /><path d="M6 8v3" /><path d="M12 8v3" /><path d="M18 8v3" /><path d="M15 8v2" /></svg>`;
+    div.appendChild(button);
+    div.addEventListener('click', () => {
+      if (rulerInvisible.isActive) {
+        rulerInvisible.deactivate();
+        button.style.removeProperty('color');
+      } else {
+        rulerInvisible.activate();
+        button.style.setProperty('color', '#4264fb');
+      }
+    });
+    return div;
+  }
+  onRemove(): void {
+    if (this.elem) {
+      document.removeChild(this.elem);
+    }
+  }
+}
+
+map.addControl(rulerInvisible as unknown as IControl);
+map.addControl(new NavigationControl({showCompass: false}));
+map.addControl(new RulerControl());
+
+map.dragRotate.disable();
+map.touchZoomRotate.disableRotation();
 
 map.on('load', async () => {
   // GPX
-
-  const filesElem = document.getElementById('files');
+  const filesElem = document.getElementById('files') as HTMLElement;
   ROUTES.forEach(({file, name, color}) => {
     map.addSource(name, {
       type: 'geojson',
@@ -109,7 +140,6 @@ map.on('load', async () => {
   });
 
   // TERRAIN
-
   map.addSource('aws-terrain', {
     type: 'raster-dem',
     tiles: [
@@ -117,7 +147,8 @@ map.on('load', async () => {
     ],
     encoding: 'terrarium',
     tileSize: 256,
-    attribution: 'tbd',
+    attribution:
+      '© <a href="https://www.mapzen.com/rights">Mapzen</a> and <a href="https://www.mapzen.com/rights/#services-and-data-sources">others</a>',
   });
 
   map.addLayer(
@@ -138,11 +169,9 @@ map.on('load', async () => {
   );
 
   // POI
-
   await map
     .loadImage(`${location.pathname}point.png`)
     .then((res) => map.addImage('poi-marker', res.data));
-
   await fetch(`${location.href}poi.json`)
     .then((res) => res.json())
     .then((list) => {
@@ -179,113 +208,4 @@ map.on('load', async () => {
         },
       });
     });
-
-  // RULER
-
-  const rulerElem = document.getElementById('toggle-ruler');
-  const rulerLenElem = document.getElementById('ruler-len');
-
-  const ruler = {
-    type: 'FeatureCollection',
-    features: [],
-  };
-
-  const rulerLine = {
-    type: 'Feature',
-    geometry: {
-      type: 'LineString',
-      coordinates: [],
-    },
-  };
-
-  rulerElem.addEventListener('click', () => {
-    rulerActive = !rulerActive;
-    if (!rulerActive) {
-      rulerElem.textContent = 'Aktivere Lineal';
-      rulerElem.style.color = 'green';
-      rulerLine.geometry.coordinates = [];
-      ruler.features = [];
-      rulerLenElem.innerText = '0';
-      map.getSource('ruler').setData(ruler);
-    } else {
-      rulerElem.textContent = 'Deaktivere Lineal';
-      rulerElem.style.color = 'chocolate';
-    }
-  });
-
-  map.addSource('ruler', {type: 'geojson', data: ruler});
-  map.addLayer({
-    id: 'ruler-points',
-    type: 'circle',
-    source: 'ruler',
-    paint: {
-      'circle-radius': 8,
-      'circle-color': '#000',
-      'circle-opacity': 0.6,
-    },
-    filter: ['in', '$type', 'Point'],
-  });
-  map.addLayer({
-    id: 'ruler-lines',
-    type: 'line',
-    source: 'ruler',
-    layout: {
-      'line-cap': 'round',
-      'line-join': 'round',
-    },
-    paint: {
-      'line-color': '#000',
-      'line-width': 4,
-      'line-opacity': 0.6,
-    },
-    filter: ['in', '$type', 'LineString'],
-  });
-
-  map.on('click', (e) => {
-    if (!rulerActive) {
-      return;
-    }
-
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['ruler-points'],
-    });
-
-    if (ruler.features.length > 1) ruler.features.pop();
-
-    rulerLenElem.innerText = '0';
-
-    if (features.length) {
-      const id = features[0].properties.id;
-      ruler.features = ruler.features.filter((p) => p.properties.id !== id);
-    } else {
-      ruler.features.push({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [e.lngLat.lng, e.lngLat.lat],
-        },
-        properties: {
-          id: String(new Date().getTime()),
-        },
-      });
-    }
-
-    if (ruler.features.length > 1) {
-      rulerLine.geometry.coordinates = ruler.features.map(
-        (p) => p.geometry.coordinates,
-      );
-      ruler.features.push(rulerLine);
-      const len = length(rulerLine).toLocaleString();
-      rulerLenElem.innerText = len;
-    }
-
-    map.getSource('ruler').setData(ruler);
-  });
-
-  map.on('mousemove', (e) => {
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['ruler-points'],
-    });
-    map.getCanvas().style.cursor = features.length ? 'pointer' : 'crosshair';
-  });
 });

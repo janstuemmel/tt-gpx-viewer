@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@mapbox-controls/ruler": "^3.0.0",
-    "@versatiles/style": "^5.0.0",
+    "@versatiles/style": "^5.8.4",
     "maplibre-gl": "^4.7.1",
     "maplibre-gl-vector-text-protocol": "^0.0.5"
   }

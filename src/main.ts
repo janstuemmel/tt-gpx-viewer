@@ -6,7 +6,7 @@ import maplibre, {
 import * as mapTextProto from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import RulerControlInvisible from '@mapbox-controls/ruler';
-import {empty} from '@versatiles/style';
+import {colorful} from '@versatiles/style';
 import '@mapbox-controls/ruler/src/index.css';
 import './main.css';
 
@@ -26,17 +26,17 @@ const ROUTES = [
   {file: '24-10-tun.gpx', name: 'Tunesien 10/2024', color: '#0F4C81'},
 ];
 
-const style = empty({
+const style = colorful({
   tiles: ['/tiles/osm/{z}/{x}/{y}'],
   baseUrl: 'https://tiles.versatiles.org',
-  glyphs: '/assets/fonts/{fontstack}/{range}.pbf',
-  sprite: [
-    {id: 'versatiles', url: '/assets/sprites/sprites'},
-    {
-      id: 'osm',
-      url: 'https://demotiles.maplibre.org/styles/osm-bright-gl-style/sprite',
-    },
-  ],
+  // glyphs: '/assets/fonts/{fontstack}/{range}.pbf',
+  // sprite: [
+  //   {id: 'versatiles', url: '/assets/sprites/sprites'},
+  //   {
+  //     id: 'osm',
+  //     url: 'https://demotiles.maplibre.org/styles/osm-bright-gl-style/sprite',
+  //   },
+  // ],
 });
 
 console.log(style);
@@ -104,9 +104,12 @@ map.dragRotate.disable();
 map.touchZoomRotate.disableRotation();
 
 map.on('load', async () => {
+  const routesUrl = `${location.pathname}routes.json`;
+  const routes = await fetch(routesUrl).then((res) => res.json());
+
   // GPX
   const filesElem = document.getElementById('files') as HTMLElement;
-  ROUTES.forEach(({file, name, color}) => {
+  routes.forEach(({file, name, color}) => {
     map.addSource(name, {
       type: 'geojson',
       data: `gpx://${location.pathname}${file}`,
